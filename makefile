@@ -18,7 +18,6 @@ lru1: compile memsim
 	bash -c 'diff -u trace1-4frames-lru <(./memsim trace1 4 lru quiet)'
 
 clock2: compile memsim
-	echo clock2
 	./memsim trace2 6 clock debug
 	bash -c 'diff -u trace2-6frames-clock <(./memsim trace2 6 clock quiet)'
 

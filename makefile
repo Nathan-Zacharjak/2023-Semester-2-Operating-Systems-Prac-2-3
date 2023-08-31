@@ -7,7 +7,7 @@
 all: clock1 lru1 clock2 lru2 clock3 lru3
 
 compile: memsim.c
-	gcc -std=c11 -Wall -O2 -o memsim memsim.c
+	gcc -std=c11 -Wall -O3 -o memsim memsim.c
 
 clock1: compile memsim
 	./memsim trace1 4 clock debug

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-
+#include <stdlib.h>
 
 typedef struct {
         int pageNo;
@@ -13,6 +13,8 @@ int     allocateFrame( int ) ;
 page    selectVictim( int, enum repl) ;
 const   int pageoffset = 12;            /* Page size is fixed to 4 KB */
 int     numFrames ;
+#define MAX_FRAMES 100
+int 	aSimpleArray[MAX_FRAMES];
 
 /* Creates the page table structure to record memory allocation */
 int     createMMU (int frames)
@@ -38,7 +40,7 @@ int     checkInMemory( int page_number)
 int     allocateFrame( int page_number)
 {
         // to do
-        return;
+        return 0;
 }
 
 /* Selects a victim for eviction/discard according to the replacement algorithm,  returns chosen frame_no  */
@@ -51,18 +53,28 @@ page    selectVictim(int page_number, enum repl  mode )
         return (victim) ;
 }
 
+// void testFunc(int var){
+// 	int arr[var];
+
+// 	arr[var-1] = 384378;
+// 	printf("%d\n", arr[var-1]);
+// 	return;
+// }
+
 		
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-  
+	// int var = 5;
+	// testFunc(var);
 	char	*tracename;
 	int	page_number,frame_no, done ;
-	int	do_line, i;
+	int	do_line;
+	// int i;
 	int	no_events, disk_writes, disk_reads;
 	int     debugmode;
  	enum	repl  replace;
 	int	allocated=0; 
-	int	victim_page;
+	// int	victim_page;
         unsigned address;
     	char 	rw;
 	page	Pvictim;
@@ -168,5 +180,8 @@ main(int argc, char *argv[])
 	printf( "total disk reads:     %d\n", disk_reads);
 	printf( "total disk writes:    %d\n", disk_writes);
 	printf( "page fault rate:      %.4f\n", (float) disk_reads/no_events);
+
+
+	return 0;
 }
 				

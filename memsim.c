@@ -15,8 +15,8 @@ int     allocateFrame( int ) ;
 page    selectVictim( int, enum repl) ;
 const   int pageoffset = 12;            /* Page size is fixed to 4 KB */
 int     numFrames ;
-#define TLB_SIZE 10
-page 	TLB_Structure[TLB_SIZE];
+#define TABLE_SIZE 8
+page 	PageTable[TABLE_SIZE];
 
 /* Creates the page table structure to record memory allocation */
 // Return 0 = success
@@ -24,7 +24,7 @@ page 	TLB_Structure[TLB_SIZE];
 int     createMMU (int frames)
 {
         // to do
-	TLB_Structure[];
+		numFrames = frames;
 
         return 0;
 }
@@ -40,7 +40,7 @@ int     checkInMemory( int page_number)
 
         // to do
 		for (int i = 0; i < numFrames; i++){
-			if (TLB_Structure[i].pageNo == page_number){
+			if (PageTable[i].pageNo == page_number){
 				return i;
 			}
 		}
@@ -54,9 +54,9 @@ int     allocateFrame( int page_number)
         // to do
 		// A page number of -1 designates the page as free/unused
 		for (int i = 0; i < numFrames; i++){
-			if(TLB_Structure[i].pageNo == -1){
-				TLB_Structure[i].pageNo = page_number;
-				TLB_Structure[i].modified = 0;
+			if(PageTable[i].pageNo == -1){
+				PageTable[i].pageNo = page_number;
+				PageTable[i].modified = 0;
 				return i;
 			}
 		}
@@ -66,21 +66,30 @@ int     allocateFrame( int page_number)
 
 page randomReplace(){
 	page nothingPage;
+	nothingPage.modified = -1;
+	nothingPage.pageNo = -1;
 	return nothingPage;
 }
 
+// OPTIONAL
 page fifoReplace(){
 	page nothingPage;
+	nothingPage.modified = -1;
+	nothingPage.pageNo = -1;
 	return nothingPage;
 }
 
 page lruReplace(){
 	page nothingPage;
+	nothingPage.modified = -1;
+	nothingPage.pageNo = -1;
 	return nothingPage;
 }
 
 page clockReplace(){
 	page nothingPage;
+	nothingPage.modified = -1;
+	nothingPage.pageNo = -1;
 	return nothingPage;
 }
 

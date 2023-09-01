@@ -4,10 +4,10 @@
 # Run "make compile" to just compile the memsim program
 # Run "make" to run every combination of trace file and algorithim in order
 
-all: clock1 lru1 clock2 lru2 clock3 lru3
-
 compile: memsim.c
 	gcc -std=c11 -Wall -O3 -o memsim memsim.c
+
+all: clock1 lru1 clock2 lru2 clock3 lru3
 
 clock1: compile memsim
 	./memsim trace1 4 clock debug

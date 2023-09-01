@@ -2,8 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+// A page number of -1 designates the page as free/unused!
 typedef struct {
         int pageNo;
+		// Big brain: use to count the number of times this page is accessed for LRU replacement
         int modified;
 } page;
 enum    repl { random, fifo, lru, clock};
@@ -13,25 +15,35 @@ int     allocateFrame( int ) ;
 page    selectVictim( int, enum repl) ;
 const   int pageoffset = 12;            /* Page size is fixed to 4 KB */
 int     numFrames ;
-#define MAX_FRAMES 100
-int 	aSimpleArray[MAX_FRAMES];
+#define TLB_SIZE 10
+page 	TLB_Structure[TLB_SIZE];
 
 /* Creates the page table structure to record memory allocation */
+// Return 0 = success
+// Return -1 = Fail :(
 int     createMMU (int frames)
 {
-
         // to do
+	TLB_Structure[];
 
         return 0;
 }
 
 /* Checks for residency: returns frame no or -1 if not found */
+// Looks in TLB if the given page is saved in it
+// Returns -1 if the page isn't in there
+// Returns 0 if the page is found
+// Use numFrames to tell how big the TLB is, and loop through it all
 int     checkInMemory( int page_number)
 {
         int     result = -1;
 
         // to do
-
+		for (int i = 0; i < numFrames; i++){
+			if (TLB_Structure[i].pageNo == page_number){
+				return i;
+			}
+		}
 
         return result ;
 }
@@ -40,7 +52,36 @@ int     checkInMemory( int page_number)
 int     allocateFrame( int page_number)
 {
         // to do
+		// A page number of -1 designates the page as free/unused
+		for (int i = 0; i < numFrames; i++){
+			if(TLB_Structure[i].pageNo == -1){
+				TLB_Structure[i].pageNo = page_number;
+				TLB_Structure[i].modified = 0;
+				return i;
+			}
+		}
+				
         return 0;
+}
+
+page randomReplace(){
+	page nothingPage;
+	return nothingPage;
+}
+
+page fifoReplace(){
+	page nothingPage;
+	return nothingPage;
+}
+
+page lruReplace(){
+	page nothingPage;
+	return nothingPage;
+}
+
+page clockReplace(){
+	page nothingPage;
+	return nothingPage;
 }
 
 /* Selects a victim for eviction/discard according to the replacement algorithm,  returns chosen frame_no  */
@@ -48,6 +89,27 @@ page    selectVictim(int page_number, enum repl  mode )
 {
         page    victim;
         // to do 
+		switch (mode)
+		{
+		case random:
+			victim = randomReplace();
+			break;
+		
+		case fifo:
+			victim = fifoReplace();
+			break;
+		
+		case lru:
+			victim = lruReplace();
+			break;
+		
+		case clock:
+			victim = clockReplace();
+			break;
+		
+		default:
+			break;
+		}
         victim.pageNo = 0;
         victim.modified = 0;
         return (victim) ;

@@ -5,7 +5,8 @@
 # Run "make" to run every combination of trace file and algorithim in order
 
 compile: memsim.c
-	gcc -std=c11 -Wall -O3 -o memsim memsim.c
+	gcc -Wall -O3 -o memsim memsim.c
+#	gcc -o memsim memsim.c
 
 all: clock1 lru1 clock2 lru2 clock3 lru3
 

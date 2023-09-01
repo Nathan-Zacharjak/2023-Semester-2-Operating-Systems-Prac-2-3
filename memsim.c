@@ -8,7 +8,7 @@ typedef struct {
 		// Big brain: use to count the number of times this page is accessed for LRU replacement
         int modified;
 } page;
-enum    repl { random, fifo, lru, clock};
+enum    repl { rdm, fifo, lru, clock};
 int     createMMU( int);
 int     checkInMemory( int ) ;
 int     allocateFrame( int ) ;
@@ -64,7 +64,7 @@ int     allocateFrame( int page_number)
         return 0;
 }
 
-page randomReplace(){
+page rdmReplace(){
 	page nothingPage;
 	nothingPage.modified = -1;
 	nothingPage.pageNo = -1;
@@ -100,8 +100,8 @@ page    selectVictim(int page_number, enum repl  mode )
         // to do 
 		switch (mode)
 		{
-		case random:
-			victim = randomReplace();
+		case rdm:
+			victim = rdmReplace();
 			break;
 		
 		case fifo:
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
         if (strcmp(argv[3], "lru\0") == 0)
             replace = lru;
 	    else if (strcmp(argv[3], "rand\0") == 0)
-	     replace = random;
+	     replace = rdm;
 	          else if (strcmp(argv[3], "clock\0") == 0)
                        replace = clock;		 
 	               else if (strcmp(argv[3], "fifo\0") == 0)

@@ -15,6 +15,11 @@ enum    repl { rdm, fifo, lru, clockEnum};
 int     createMMU( int);
 int     checkInMemory( int ) ;
 int     allocateFrame( int ) ;
+page 	rdmReplace();
+page 	fifoReplace();
+void 	lruBubbleSortPageTable(int usedFrameNumber);
+page 	lruReplace();
+page 	clockReplace();
 page    selectVictim( int, enum repl) ;
 const   int pageoffset = 12;            /* Page size is fixed to 4 KB */
 int     numFrames ;
@@ -87,12 +92,22 @@ page fifoReplace(){
 	return nothingPage;
 }
 
-// Picks the page that was least recently used
+// Picks the page that was least recently used and bubbles it up to the top of the PageTable (last index)
+void lruBubbleSortPageTable(int usedFrameNumber){
+	while (usedFrameNumber < numFrames){
+		page temp = PageTable[usedFrameNumber + 1];
+		PageTable[usedFrameNumber + 1] = PageTable[usedFrameNumber];
+		PageTable[usedFrameNumber] = temp;
+		usedFrameNumber++;
+	}
+
+	return;
+}
+
 page lruReplace(){
-	page nothingPage;
-	nothingPage.modified = -1;
-	nothingPage.pageNo = -1;
-	return nothingPage;
+	// Always return the first page in the PageTable, as the PageTable is being sorted
+	// by the above function in the main function, whenever a page is being "used" (read or written to)
+	return PageTable[0];
 }
 
 // Selects pages in a circular buffer-style
@@ -237,8 +252,15 @@ int main(int argc, char *argv[]){
 		
 		if ( rw == 'R'){
 		    if (debugmode) printf( "reading    %8d \n", page_number) ;
+			// Modified for the "least recently used" algorithm, to keep track of page frames being "used"
+			lruBubbleSortPageTable(frame_no);
+						
 		}
 		else if ( rw == 'W'){
+		    if (debugmode) printf( "writting   %8d \n", page_number) ;
+			// Modified for the "least recently used" algorithm, to keep track of page frames being "used"
+			lruBubbleSortPageTable(frame_no);
+
 		    // "mark page in page table as written - modified"
 			// Need to do this as a bit of missing core functionality of the MMU, wasn't given to us
 			// since it needs the PageTable array we had to create
@@ -246,14 +268,12 @@ int main(int argc, char *argv[]){
 			// Basically, if a frame in an actual page table is never written to, the memory address can just
 			// be "discarded" since the actual memory address in the main memory never has to be modified.
 			// Buuuuut.... If the memory address in the page table has had it's value modified, and it's
-			// getting discarded by a replacement algorithim, its value now needs to be saved to main memory
+			// getting discarded by a replacement algorithm, its value now needs to be saved to main memory
 			// beforehand.
 			// So this incurs an extra "Write operation", which is recorded above by the "disk_writes++;" line
 			// and is triggered by having the "modified" value in a page being non-zero
 			// (We'll just set it to 1)
 			PageTable[frame_no].modified = 1;
-
-		    if (debugmode) printf( "writting   %8d \n", page_number) ;
 		}
 		 else {
 		      printf( "Badly formatted file. Error on line %d\n", no_events+1); 

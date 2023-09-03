@@ -91,10 +91,14 @@ page lruReplace(){
 // Selects pages in a circular buffer-style
 int	nextClockReplacement = 0;
 page clockReplace(){
-	page nothingPage;
-	nothingPage.modified = -1;
-	nothingPage.pageNo = -1;
-	return nothingPage;
+	page victim = PageTable[nextClockReplacement];
+
+	nextClockReplacement++;
+	if (nextClockReplacement > TABLE_SIZE){
+		nextClockReplacement = 0;
+	}
+	
+	return victim;
 }
 
 /* Selects a victim for eviction/discard according to the replacement algorithm,  returns chosen frame_no  */

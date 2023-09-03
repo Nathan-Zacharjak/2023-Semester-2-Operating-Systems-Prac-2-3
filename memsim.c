@@ -16,18 +16,22 @@ int     allocateFrame( int ) ;
 page    selectVictim( int, enum repl) ;
 const   int pageoffset = 12;            /* Page size is fixed to 4 KB */
 int     numFrames ;
-#define TABLE_SIZE 8
-page 	PageTable[TABLE_SIZE];
+// The "Physical" page table size (we will hopefully only ever request up to 8 page table slots...)
+#define MAX_PAGE_TABLE_SIZE 8
+page 	PageTable[MAX_PAGE_TABLE_SIZE];
 
 /* Creates the page table structure to record memory allocation */
 // Return 0 = success
 // Return -1 = Fail :(
-int     createMMU (int frames)
-{
-        // to do
-		numFrames = frames;
-
-        return 0;
+int	createMMU (int frames){
+	if (frames > MAX_PAGE_TABLE_SIZE){
+		// Requested amount of frames is too big...
+		return -1;
+	}
+	
+	// Otherwise, set the number of usable frames in the PageTable to numFrames
+	numFrames = frames;
+    return 0;
 }
 
 /* Checks for residency: returns frame no or -1 if not found */
@@ -67,8 +71,8 @@ int     allocateFrame( int page_number)
 
 // Just randomly picks a page to replace
 page rdmReplace(){
-	// Gets a random integer from 0 to TABLE_SIZE
-	int rdmNum = rand() % TABLE_SIZE;
+	// Gets a random integer from 0 to numFrames
+	int rdmNum = rand() % numFrames;
 	page victim = PageTable[rdmNum];
 	return victim;
 }
@@ -95,7 +99,7 @@ page clockReplace(){
 	page victim = PageTable[nextClockReplacement];
 
 	nextClockReplacement++;
-	if (nextClockReplacement > TABLE_SIZE){
+	if (nextClockReplacement > numFrames){
 		nextClockReplacement = 0;
 	}
 	

@@ -64,6 +64,7 @@ int     allocateFrame( int page_number)
         return 0;
 }
 
+// Just randomly picks a page to replace
 page rdmReplace(){
 	page nothingPage;
 	nothingPage.modified = -1;
@@ -79,6 +80,7 @@ page fifoReplace(){
 	return nothingPage;
 }
 
+// Picks the page that was least recently used
 page lruReplace(){
 	page nothingPage;
 	nothingPage.modified = -1;
@@ -86,6 +88,8 @@ page lruReplace(){
 	return nothingPage;
 }
 
+// Selects pages in a circular buffer-style
+int	nextClockReplacement = 0;
 page clockReplace(){
 	page nothingPage;
 	nothingPage.modified = -1;
@@ -119,9 +123,8 @@ page    selectVictim(int page_number, enum repl  mode )
 		default:
 			break;
 		}
-        victim.pageNo = 0;
-        victim.modified = 0;
-        return (victim) ;
+
+        return victim;
 }
 
 // void testFunc(int var){
@@ -140,14 +143,12 @@ int main(int argc, char *argv[])
 	char	*tracename;
 	int	page_number,frame_no, done ;
 	int	do_line;
-	// int i;
 	int	no_events, disk_writes, disk_reads;
 	int     debugmode;
  	enum	repl  replace;
-	int	allocated=0; 
-	// int	victim_page;
-        unsigned address;
-    	char 	rw;
+	int	allocated = 0; 
+    unsigned address;
+    char 	rw;
 	page	Pvictim;
 	FILE	*trace;
 
@@ -202,7 +203,7 @@ int main(int argc, char *argv[])
 	disk_writes = 0 ;
 	disk_reads = 0 ;
 
-        do_line = fscanf(trace,"%x %c",&address,&rw);
+    do_line = fscanf(trace,"%x %c",&address,&rw);
 	while ( do_line == 2)
 	{
 		page_number =  address >> pageoffset;
@@ -230,6 +231,7 @@ int main(int argc, char *argv[])
                       if (debugmode) printf( "Discard    %8d \n", Pvictim.pageNo) ;
 		   }
 		}
+		
 		if ( rw == 'R'){
 		    if (debugmode) printf( "reading    %8d \n", page_number) ;
 		}

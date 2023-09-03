@@ -6,7 +6,9 @@
 // A page number of -1 designates the page as free/unused!
 typedef struct {
         int pageNo;
-		// Big brain: use to count the number of times this page is accessed for LRU replacement
+		// Used for telling if a page frame has ever been used for writing data to,
+		// 0 designates that frame has never been written to
+		// 1 designates it has at least once while in the PageTable
         int modified;
 } page;
 enum    repl { rdm, fifo, lru, clock};

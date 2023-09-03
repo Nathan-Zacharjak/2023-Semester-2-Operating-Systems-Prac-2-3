@@ -23,8 +23,8 @@ page 	clockReplace();
 page    selectVictim( int, enum repl) ;
 const   int pageoffset = 12;            /* Page size is fixed to 4 KB */
 int     numFrames ;
-// The "Physical" page table size (we will hopefully only ever request up to 8 page table slots...)
-#define MAX_PAGE_TABLE_SIZE 8
+// The "Physical" page table size (we will hopefully only ever request up to 100 page table slots...)
+#define MAX_PAGE_TABLE_SIZE 100
 page 	PageTable[MAX_PAGE_TABLE_SIZE];
 
 /* Creates the page table structure to record memory allocation */

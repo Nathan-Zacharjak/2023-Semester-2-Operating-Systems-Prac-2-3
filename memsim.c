@@ -37,10 +37,10 @@ int	createMMU (int frames){
 }
 
 /* Checks for residency: returns frame no or -1 if not found */
-// Looks in TLB if the given page is saved in it
+// Looks in PageTable if the given page is saved in it
 // Returns -1 if the page isn't in there
 // Returns 0 if the page is found
-// Use numFrames to tell how big the TLB is, and loop through it all
+// Use numFrames to tell how big the PageTable is, and loop through it all
 int     checkInMemory( int page_number)
 {
         int     result = -1;
@@ -239,7 +239,20 @@ int main(int argc, char *argv[]){
 		    if (debugmode) printf( "reading    %8d \n", page_number) ;
 		}
 		else if ( rw == 'W'){
-		    // mark page in page table as written - modified  
+		    // "mark page in page table as written - modified"
+			// Need to do this as a bit of missing core functionality of the MMU, wasn't given to us
+			// since it needs the PageTable array we had to create
+
+			// Basically, if a frame in an actual page table is never written to, the memory address can just
+			// be "discarded" since the actual memory address in the main memory never has to be modified.
+			// Buuuuut.... If the memory address in the page table has had it's value modified, and it's
+			// getting discarded by a replacement algorithim, its value now needs to be saved to main memory
+			// beforehand.
+			// So this incurs an extra "Write operation", which is recorded above by the "disk_writes++;" line
+			// and is triggered by having the "modified" value in a page being non-zero
+			// (We'll just set it to 1)
+			PageTable[frame_no].modified = 1;
+
 		    if (debugmode) printf( "writting   %8d \n", page_number) ;
 		}
 		 else {

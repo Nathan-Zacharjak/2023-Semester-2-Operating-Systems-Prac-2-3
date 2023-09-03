@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 // A page number of -1 designates the page as free/unused!
 typedef struct {
@@ -66,10 +67,10 @@ int     allocateFrame( int page_number)
 
 // Just randomly picks a page to replace
 page rdmReplace(){
-	page nothingPage;
-	nothingPage.modified = -1;
-	nothingPage.pageNo = -1;
-	return nothingPage;
+	// Gets a random integer from 0 to TABLE_SIZE
+	int rdmNum = rand() % TABLE_SIZE;
+	page victim = PageTable[rdmNum];
+	return victim;
 }
 
 // OPTIONAL
@@ -131,19 +132,11 @@ page    selectVictim(int page_number, enum repl  mode )
         return victim;
 }
 
-// void testFunc(int var){
-// 	int arr[var];
-
-// 	arr[var-1] = 384378;
-// 	printf("%d\n", arr[var-1]);
-// 	return;
-// }
-
-		
-int main(int argc, char *argv[])
-{
-	// int var = 5;
-	// testFunc(var);
+int main(int argc, char *argv[]){
+	// Initialising random number generation
+	srand(time(NULL));
+	
+	// Originally given code
 	char	*tracename;
 	int	page_number,frame_no, done ;
 	int	do_line;

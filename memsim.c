@@ -11,7 +11,7 @@ typedef struct {
 		// 1 designates it has at least once while in the PageTable
         int modified;
 } page;
-enum    repl { rdm, fifo, lru, clock};
+enum    repl { rdm, fifo, lru, clockEnum};
 int     createMMU( int);
 int     checkInMemory( int ) ;
 int     allocateFrame( int ) ;
@@ -127,7 +127,7 @@ page    selectVictim(int page_number, enum repl  mode )
 			victim = lruReplace();
 			break;
 		
-		case clock:
+		case clockEnum:
 			victim = clockReplace();
 			break;
 		
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]){
 	    else if (strcmp(argv[3], "rand\0") == 0)
 	     replace = rdm;
 	          else if (strcmp(argv[3], "clock\0") == 0)
-                       replace = clock;		 
+                       replace = clockEnum;		 
 	               else if (strcmp(argv[3], "fifo\0") == 0)
                              replace = fifo;		 
         else 

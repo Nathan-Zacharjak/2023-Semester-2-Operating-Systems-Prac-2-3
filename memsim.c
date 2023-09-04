@@ -128,7 +128,7 @@ page fifoReplace(){
 void lruBubbleSortPageTable(int usedFrameNumber){
 	// If the number of frames is 4, the highest index in PageTable is 3, etc.
 	while (usedFrameNumber < numFrames - 1){
-		// printf("From frame %d to frame %d is: %d to %d\n", usedFrameNumber, usedFrameNumber + 1, PageTable[usedFrameNumber].pageNo, PageTable[usedFrameNumber + 1].pageNo);
+		//printf("From frame %d to frame %d is: %d to %d\n", usedFrameNumber, usedFrameNumber + 1, PageTable[usedFrameNumber].pageNo, PageTable[usedFrameNumber + 1].pageNo);
 		page temp = PageTable[usedFrameNumber + 1];
 		PageTable[usedFrameNumber + 1] = PageTable[usedFrameNumber];
 		PageTable[usedFrameNumber] = temp;
@@ -344,9 +344,10 @@ int main(int argc, char *argv[]){
 		    if (debugmode) printf( "reading    %8d \n", page_number) ;
 			// Modified for the "least recently used" algorithm, to keep track of page frames being "used"
 
-			//lruBubbleSortPageTable(frame_no);
-
-
+			if (replace == lru){
+				lruBubbleSortPageTable(frame_no);
+			}	
+			
 			accessed[frame_no] += 1;
 
 			//PageTable[frame_no].clockBit = 1;
@@ -361,7 +362,8 @@ int main(int argc, char *argv[]){
 			// }
 			// Modified for the "least recently used" algorithm, to keep track of page frames being "used"
 
-			//lruBubbleSortPageTable(frame_no);
+			
+			
 
 			// printf("After bubble sort:\n");
 			// for (int i = 0; i < numFrames; i++){
@@ -385,7 +387,9 @@ int main(int argc, char *argv[]){
 			// (We'll just set it to 1)
 			PageTable[frame_no].modified = 1;
 
-
+			if (replace == lru){
+				lruBubbleSortPageTable(frame_no);
+			}	
 			accessed[frame_no] += 1;
 			
 			

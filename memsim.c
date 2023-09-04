@@ -135,7 +135,8 @@ page clockReplace(){
 		}
 
 		CLOCK_POINTER++;
-		if (CLOCK_POINTER > numFrames){
+		// If the number of frames is 4, the highest index in PageTable is 3, etc.
+		if (CLOCK_POINTER > numFrames - 1){
 			CLOCK_POINTER = 0;
 		}
 		

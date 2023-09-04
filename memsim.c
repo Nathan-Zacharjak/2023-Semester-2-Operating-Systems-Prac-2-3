@@ -27,20 +27,32 @@ int     numFrames ;
 // The "Physical" page table size (we will hopefully only ever request up to 100 page table slots...)
 #define MAX_PAGE_TABLE_SIZE 100
 page 	PageTable[MAX_PAGE_TABLE_SIZE];
+// page* 	PageTable;
 int 	CLOCK_POINTER = 0;
 
 /* Creates the page table structure to record memory allocation */
 // Return 0 = success
 // Return -1 = Fail :(
 int	createMMU (int frames){
-	if (frames > MAX_PAGE_TABLE_SIZE){
-		// Requested amount of frames is too big...
+	// PageTable = malloc(sizeof(page) * frames);
+
+	if (PageTable == NULL){
+		// Requested amount of frames is too big, or memory otherwise failed to be allocated
 		return -1;
+	} else {
+		// Otherwise, set the number of usable frames in the PageTable to numFrames
+		// And initialise the PageTable with empty pages
+		numFrames = frames;
+		for (int i = 0; i < numFrames; i++){
+			page emptyPage;
+			emptyPage.pageNo = -1;
+			emptyPage.modified = -1;
+			emptyPage.clockBit = -1;
+			PageTable[i] = emptyPage;
+		}
+		
+    	return 0;
 	}
-	
-	// Otherwise, set the number of usable frames in the PageTable to numFrames
-	numFrames = frames;
-    return 0;
 }
 
 /* Checks for residency: returns frame no or -1 if not found */
@@ -58,7 +70,7 @@ int     checkInMemory( int page_number)
 				return i;
 			}
 		}
-
+		// printf("Looking for %d, found %d\n", page_number, result);
         return result ;
 }
 
@@ -103,7 +115,9 @@ page fifoReplace(){
 
 // Picks the page that was least recently used and bubbles it up to the top of the PageTable (last index)
 void lruBubbleSortPageTable(int usedFrameNumber){
-	while (usedFrameNumber < numFrames){
+	// If the number of frames is 4, the highest index in PageTable is 3, etc.
+	while (usedFrameNumber < numFrames - 1){
+		// printf("From frame %d to frame %d is: %d to %d\n", usedFrameNumber, usedFrameNumber + 1, PageTable[usedFrameNumber].pageNo, PageTable[usedFrameNumber + 1].pageNo);
 		page temp = PageTable[usedFrameNumber + 1];
 		PageTable[usedFrameNumber + 1] = PageTable[usedFrameNumber];
 		PageTable[usedFrameNumber] = temp;
@@ -239,6 +253,12 @@ int main(int argc, char *argv[]){
 		 printf( "Cannot create MMU" ) ;
 		 exit(-1);
         }
+	
+	// printf("Initialised MMU:\n");
+	// for (int i = 0; i < numFrames; i++){
+	// 	printf("Page no:%d Modified:%d ClockBit:%d\n", PageTable[i].pageNo, PageTable[i].modified, PageTable[i].clockBit);
+	// }
+
 	no_events = 0 ;
 	disk_writes = 0 ;
 	disk_reads = 0 ;
@@ -256,7 +276,8 @@ int main(int argc, char *argv[]){
 		      printf( "Page fault %8d \n", page_number) ;
 		  if (allocated < numFrames)  			/* allocate it to an empty frame */
 		   {
-                     frame_no = allocateFrame(page_number);
+            frame_no = allocateFrame(page_number);
+
 		     allocated++;
                    }
                    else{
@@ -281,8 +302,18 @@ int main(int argc, char *argv[]){
 		}
 		else if ( rw == 'W'){
 		    if (debugmode) printf( "writting   %8d \n", page_number) ;
+
+			// printf("Before bubble sort:\n");
+			// for (int i = 0; i < numFrames; i++){
+			// 	printf("Page no:%d Modified:%d ClockBit:%d\n", PageTable[i].pageNo, PageTable[i].modified, PageTable[i].clockBit);
+			// }
 			// Modified for the "least recently used" algorithm, to keep track of page frames being "used"
 			lruBubbleSortPageTable(frame_no);
+			// printf("After bubble sort:\n");
+			// for (int i = 0; i < numFrames; i++){
+			// 	printf("Page no:%d Modified:%d ClockBit:%d\n", PageTable[i].pageNo, PageTable[i].modified, PageTable[i].clockBit);
+			// }
+
 			PageTable[frame_no].clockBit = 1;
 
 		    // "mark page in page table as written - modified"
@@ -304,6 +335,12 @@ int main(int argc, char *argv[]){
 		      exit (-1);
 		}
 
+		// printf("Page table after event %d:\n", no_events);
+		// for (int i = 0; i < numFrames; i++){
+		// 	printf("Page no:%d Modified:%d ClockBit:%d\n", PageTable[i].pageNo, PageTable[i].modified, PageTable[i].clockBit);
+		// }
+		
+
 		no_events++;
         	do_line = fscanf(trace,"%x %c",&address,&rw);
 	}
@@ -314,6 +351,8 @@ int main(int argc, char *argv[]){
 	printf( "total disk writes:    %d\n", disk_writes);
 	printf( "page fault rate:      %.4f\n", (float) disk_reads/no_events);
 
+	// // We're finally done with the PageTable so free its memory
+	// free(PageTable);
 
 	return 0;
 }

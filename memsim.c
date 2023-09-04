@@ -89,13 +89,13 @@ page rdmReplace(){
 
 // OPTIONAL
 // Selects pages in a circular buffer-style
-int	nextClockReplacement = 0;
+int	nextFifoReplacement = 0;
 page fifoReplace(){
-	page victim = PageTable[nextClockReplacement];
+	page victim = PageTable[nextFifoReplacement];
 
-	nextClockReplacement++;
-	if (nextClockReplacement > numFrames){
-		nextClockReplacement = 0;
+	nextFifoReplacement++;
+	if (nextFifoReplacement > numFrames){
+		nextFifoReplacement = 0;
 	}
 	
 	return victim;

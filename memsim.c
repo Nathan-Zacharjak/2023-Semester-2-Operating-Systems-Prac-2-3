@@ -344,7 +344,7 @@ int main(int argc, char *argv[]){
 		    if (debugmode) printf( "reading    %8d \n", page_number) ;
 			// Modified for the "least recently used" algorithm, to keep track of page frames being "used"
 
-			lruBubbleSortPageTable(frame_no);
+			//lruBubbleSortPageTable(frame_no);
 
 
 			accessed[frame_no] += 1;
@@ -361,7 +361,7 @@ int main(int argc, char *argv[]){
 			// }
 			// Modified for the "least recently used" algorithm, to keep track of page frames being "used"
 
-			lruBubbleSortPageTable(frame_no);
+			//lruBubbleSortPageTable(frame_no);
 
 			// printf("After bubble sort:\n");
 			// for (int i = 0; i < numFrames; i++){
@@ -406,8 +406,8 @@ int main(int argc, char *argv[]){
 
 
 		no_events++;
-		printf("page table after event %d :", no_events);
-		print_table();
+		//printf("page table after event %d :", no_events);
+		//print_table();
         	do_line = fscanf(trace,"%x %c",&address,&rw);
 	}
 

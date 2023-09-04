@@ -26,6 +26,7 @@ int     numFrames ;
 // The "Physical" page table size (we will hopefully only ever request up to 100 page table slots...)
 #define MAX_PAGE_TABLE_SIZE 100
 page 	PageTable[MAX_PAGE_TABLE_SIZE];
+int accessed[MAX_PAGE_TABLE_SIZE] = {0};
 
 /* Creates the page table structure to record memory allocation */
 // Return 0 = success
@@ -38,6 +39,12 @@ int	createMMU (int frames){
 	
 	// Otherwise, set the number of usable frames in the PageTable to numFrames
 	numFrames = frames;
+
+	//fill page table with page num vals of -1
+	for (int i=0; i<numFrames; i++){
+		PageTable[i].pageNo = -1;
+	}
+
     return 0;
 }
 
@@ -107,18 +114,30 @@ void lruBubbleSortPageTable(int usedFrameNumber){
 page lruReplace(){
 	// Always return the first page in the PageTable, as the PageTable is being sorted
 	// by the above function in the main function, whenever a page is being "used" (read or written to)
+
 	return PageTable[0];
 }
+
 
 // Selects pages in a circular buffer-style
 int	nextClockReplacement = 0;
 page clockReplace(){
+	
+	while (accessed[nextClockReplacement] != 0){
+		//reset accessed value to 0
+		accessed[nextClockReplacement] = 0;
+		//increment pointer
+		nextClockReplacement = (nextClockReplacement + 1) % numFrames;
+	}
 	page victim = PageTable[nextClockReplacement];
+	nextClockReplacement = (nextClockReplacement + 1) % numFrames; // increment clock pointer 
+
+	/*page victim = PageTable[nextClockReplacement];
 
 	nextClockReplacement++;
 	if (nextClockReplacement > numFrames){
 		nextClockReplacement = 0;
-	}
+	}*/
 	
 	return victim;
 }
@@ -150,7 +169,20 @@ page    selectVictim(int page_number, enum repl  mode )
 			break;
 		}
 
+		//insert new page in victim location
+		int victim_frame = checkInMemory(victim.pageNo);
+		PageTable[victim_frame].pageNo = page_number;
+		PageTable[victim_frame].modified = 0; 
+		accessed[victim_frame] = 1;
+
         return victim;
+}
+
+void print_table(){
+	for (int i=0; i<numFrames; i++){
+		printf("%d ", PageTable[i].pageNo);
+	}
+	printf("\n");
 }
 
 int main(int argc, char *argv[]){
@@ -171,9 +203,9 @@ int main(int argc, char *argv[]){
 	FILE	*trace;
 
 
-        if (argc < 5) {
-             printf( "Usage: ./memsim inputfile numberframes replacementmode debugmode \n");
-             exit ( -1);
+    if (argc < 5) {
+        printf( "Usage: ./memsim inputfile numberframes replacementmode debugmode \n");
+        exit ( -1);
 	}
 	else {
         tracename = argv[1];	
@@ -211,7 +243,7 @@ int main(int argc, char *argv[]){
              exit ( -1);
 	  }
 	}
-	
+//end of input parsing	
 	done = createMMU (numFrames);
 	if ( done == -1 ) {
 		 printf( "Cannot create MMU" ) ;
@@ -234,12 +266,14 @@ int main(int argc, char *argv[]){
 		      printf( "Page fault %8d \n", page_number) ;
 		  if (allocated < numFrames)  			/* allocate it to an empty frame */
 		   {
-                     frame_no = allocateFrame(page_number);
-		     allocated++;
+                frame_no = allocateFrame(page_number);
+		     	allocated++;
                    }
                    else{
+
 		      Pvictim = selectVictim(page_number, replace) ;   /* returns page number of the victim  */
 		      frame_no = checkInMemory( page_number) ;    /* find out the frame the new page is in */
+
 		   if (Pvictim.modified)           /* need to know victim page and modified  */
 	 	      {
                       disk_writes++;			    
@@ -253,13 +287,16 @@ int main(int argc, char *argv[]){
 		if ( rw == 'R'){
 		    if (debugmode) printf( "reading    %8d \n", page_number) ;
 			// Modified for the "least recently used" algorithm, to keep track of page frames being "used"
-			lruBubbleSortPageTable(frame_no);
+			//lruBubbleSortPageTable(frame_no);
+
+
+			accessed[frame_no] += 1;
 						
 		}
 		else if ( rw == 'W'){
 		    if (debugmode) printf( "writting   %8d \n", page_number) ;
 			// Modified for the "least recently used" algorithm, to keep track of page frames being "used"
-			lruBubbleSortPageTable(frame_no);
+			//lruBubbleSortPageTable(frame_no);
 
 		    // "mark page in page table as written - modified"
 			// Need to do this as a bit of missing core functionality of the MMU, wasn't given to us
@@ -274,13 +311,20 @@ int main(int argc, char *argv[]){
 			// and is triggered by having the "modified" value in a page being non-zero
 			// (We'll just set it to 1)
 			PageTable[frame_no].modified = 1;
+
+
+			accessed[frame_no] += 1;
+			
+			
 		}
 		 else {
 		      printf( "Badly formatted file. Error on line %d\n", no_events+1); 
 		      exit (-1);
 		}
-
+		
 		no_events++;
+		printf("page table after event %d :", no_events);
+		print_table();
         	do_line = fscanf(trace,"%x %c",&address,&rw);
 	}
 

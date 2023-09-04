@@ -126,7 +126,7 @@ page clockReplace(){
 	page victim;
 	int pageFound = 0;
 
-	while(pageFound != 0){
+	while(pageFound == 0){
 		victim = PageTable[CLOCK_POINTER];
 		if (victim.clockBit != 0){
 			victim.clockBit = 0;
@@ -275,12 +275,14 @@ int main(int argc, char *argv[]){
 		    if (debugmode) printf( "reading    %8d \n", page_number) ;
 			// Modified for the "least recently used" algorithm, to keep track of page frames being "used"
 			lruBubbleSortPageTable(frame_no);
+			PageTable[frame_no].clockBit = 1;
 						
 		}
 		else if ( rw == 'W'){
 		    if (debugmode) printf( "writting   %8d \n", page_number) ;
 			// Modified for the "least recently used" algorithm, to keep track of page frames being "used"
 			lruBubbleSortPageTable(frame_no);
+			PageTable[frame_no].clockBit = 1;
 
 		    // "mark page in page table as written - modified"
 			// Need to do this as a bit of missing core functionality of the MMU, wasn't given to us

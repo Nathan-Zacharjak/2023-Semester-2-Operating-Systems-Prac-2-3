@@ -10,6 +10,7 @@ typedef struct {
 		// 0 designates that frame has never been written to
 		// 1 designates it has at least once while in the PageTable
         int modified;
+		int clockBit;
 } page;
 enum    repl { rdm, fifo, lru, clockEnum};
 int     createMMU( int);
@@ -26,6 +27,7 @@ int     numFrames ;
 // The "Physical" page table size (we will hopefully only ever request up to 100 page table slots...)
 #define MAX_PAGE_TABLE_SIZE 100
 page 	PageTable[MAX_PAGE_TABLE_SIZE];
+int 	CLOCK_POINTER = 0;
 
 /* Creates the page table structure to record memory allocation */
 // Return 0 = success
@@ -69,6 +71,7 @@ int     allocateFrame( int page_number)
 			if(PageTable[i].pageNo == -1){
 				PageTable[i].pageNo = page_number;
 				PageTable[i].modified = 0;
+				PageTable[i].clockBit = 1;
 				return i;
 			}
 		}
@@ -85,11 +88,17 @@ page rdmReplace(){
 }
 
 // OPTIONAL
+// Selects pages in a circular buffer-style
+int	nextClockReplacement = 0;
 page fifoReplace(){
-	page nothingPage;
-	nothingPage.modified = -1;
-	nothingPage.pageNo = -1;
-	return nothingPage;
+	page victim = PageTable[nextClockReplacement];
+
+	nextClockReplacement++;
+	if (nextClockReplacement > numFrames){
+		nextClockReplacement = 0;
+	}
+	
+	return victim;
 }
 
 // Picks the page that was least recently used and bubbles it up to the top of the PageTable (last index)
@@ -110,16 +119,28 @@ page lruReplace(){
 	return PageTable[0];
 }
 
-// Selects pages in a circular buffer-style
-int	nextClockReplacement = 0;
+// Selects first page that has a clock bit = 0
+// If not 0, set the bit to 0
+// If at end of page table, loop back to start
 page clockReplace(){
-	page victim = PageTable[nextClockReplacement];
+	page victim;
+	int pageFound = 0;
 
-	nextClockReplacement++;
-	if (nextClockReplacement > numFrames){
-		nextClockReplacement = 0;
+	while(pageFound != 0){
+		victim = PageTable[CLOCK_POINTER];
+		if (victim.clockBit != 0){
+			victim.clockBit = 0;
+		} else {
+			pageFound = 1;
+		}
+
+		CLOCK_POINTER++;
+		if (CLOCK_POINTER > numFrames){
+			CLOCK_POINTER = 0;
+		}
+		
 	}
-	
+
 	return victim;
 }
 

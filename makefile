@@ -33,3 +33,9 @@ clock3: compile memsim
 lru3: compile memsim
 	./memsim trace3 4 lru debug
 	bash -c 'diff -u trace3-4frames-lru <(./memsim trace3 4 lru quiet)'
+
+test: compile memsim
+	./memsim $(file) $(frames) $(algo) quiet > results/$(file)_$(frames)_$(algo).txt
+
+
+

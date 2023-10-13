@@ -1,5 +1,0 @@
-total memory frames:  4
-events in trace:      1000000
-total disk reads:     428025
-total disk writes:    57799
-page fault rate:      0.4280

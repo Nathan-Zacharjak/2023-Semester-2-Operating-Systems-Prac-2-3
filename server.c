@@ -1,4 +1,4 @@
-// Server to accept connections from clients to recieve book data to add to the stored linked list
+// Server to accept connections from clients to receive book data to add to the stored linked list
 
 #include "server.h"
 

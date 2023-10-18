@@ -16,6 +16,7 @@
   - When a client closes connection to the server, the server then loops through the list to read and write the whole book from that client to a text file, and closes the thread
 
 ## Part 2
+
 - Make 2 or more analysis threads to multi-program search through the linked list for a search term
 - Keep track of how many times search term appears per book
 - Live update to stdout (the screen) every 2-5 seconds the counts of found search term for each book

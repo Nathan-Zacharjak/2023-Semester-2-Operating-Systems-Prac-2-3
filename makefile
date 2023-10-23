@@ -5,8 +5,8 @@ all: client1 server
 
 server: compserver runserver
 
-compserver: server.c
-	gcc -Wall -O3 -o assignment3 server.c
+compserver: assignment3.c
+	gcc -Wall -O3 -o assignment3 assignment3.c
 
 # l = port number
 # p = search term

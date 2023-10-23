@@ -7,13 +7,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#define MAX_LINE 10000
+#define PORT_NUM 12345
+
 int main(){
     
     //initialise head of linked list
-    // struct Node *head = (struct Node*) malloc(sizeof(Node*));
+    struct Node *head = (struct Node*) malloc(sizeof(Node));
 
-    // Client adress nonsense
-    // struct sockaddr_in clientAddress;
 
     // Server address nonsense
     struct sockaddr_in serverAddress;
@@ -24,7 +25,7 @@ int main(){
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
     // TODO: Command line read port number not hardcode lol
-    serverAddress.sin_port = htons(1234);
+    serverAddress.sin_port = htons(PORT_NUM);
 
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0){
@@ -56,15 +57,30 @@ int main(){
         return 0;
     }
 
-    char buffer[1000];
-    bzero(buffer, 1000);
-    int readError = read(newSock, buffer, 1000);
-    if (readError < 0){
-        printf("SERVER: read error: %d\n", readError);
-        return 0;
-    }
+    char buffer[MAX_LINE];
+    while (1){
+        bzero(buffer, MAX_LINE);
+        int readStatus = read(newSock, buffer, MAX_LINE);
+        if (readStatus < 0){
+            printf("SERVER: read error: %d\n", readStatus);
+            return 0;
+        } else if (readStatus == 0){
+            printf("SERVER: REACHED EOF!\n");
+            break;
+        }
 
-    printf("SERVER: Buffer content: %s\n", buffer);
+        // printf("SERVER: Buffer content: %s\n", buffer);
+        if(head->text == NULL){
+            head->text = strdup(buffer); //<-- clutch
+        } else {
+            struct Node* newNode = (struct Node*) malloc(sizeof(Node));
+            newNode->text = strdup(buffer);
+            // printf("%s", newNode->text);
+
+            addNode(head, newNode);
+        }
+    }
+    printList(head);
     
 
     printf("SERVER: Done returning 0\n");

@@ -11,7 +11,7 @@ compserver: assignment3.c
 # l = port number
 # p = search term
 runserver: assignment3
-	./assignment3 -l 1234 -p "happy"
+	./assignment3 -l 12345 -p "happy"
 
 
 client1: compclient1 runclient1
@@ -22,4 +22,4 @@ compclient1: client.c
 # l = port number
 # b = book number
 runclient1: client
-	./client -l 1234 -b 1
+	./client -l 12345 -b 1

@@ -3,10 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX_LINE 10000
+
 typedef struct Node
 {
     // char array to hold the book text chunk sent by client
-    char text[100];
+    char* text;
 
     // links to the next element in the shared list.   
     struct Node *next;

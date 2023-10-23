@@ -57,6 +57,8 @@ int main(){
         return 0;
     }
 
+    // GO GO CREATE NEW THREAD for each client connection :)
+    
     char buffer[MAX_LINE];
     while (1){
         bzero(buffer, MAX_LINE);

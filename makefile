@@ -1,6 +1,6 @@
 # Makefile to complie and run the server and clients
 
-all: client1 server
+all: server client1
 
 
 server: compserver runserver
@@ -23,3 +23,14 @@ compclient1: client.c
 # b = book number
 runclient1: client
 	./client -l 12345 -b 1
+
+
+client2: compclient2 runclient2
+
+compclient2: client.c
+	gcc -Wall -O3 -o client client.c
+
+# l = port number
+# b = book number
+runclient2: client
+	./client -l 12345 -b 2

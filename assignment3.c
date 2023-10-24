@@ -6,15 +6,48 @@
 #include <netinet/in.h>
 #include <stdio.h>
 #include <string.h>
+// Including this just so intellisense works in VSCode, but it should work with this commented out
+// (It should be included as part of unistd.h but I was having difficulties...)
+#include <bits/getopt_posix.h>
 
 #define MAX_LINE 10000
-#define PORT_NUM 12345
 
-int main(){
+int main(int argc, char* const *argv){
+    // Reading the given arguments to run the server
+    int portNum = 0;
+    char* searchTerm = "";
+    // Used for reading arguments
+    int opt = 0;
+
+    // l = port number
+    // b = book number
+    // Fancy command-line reading function "getopt()" from the UNIX standard library: unistd.h
+    while ((opt = getopt(argc, argv, "l:p:")) != -1){
+        switch (opt){
+        case 'l':
+            portNum = atoi(optarg);
+            break;
+        case 'p':
+            searchTerm = strdup(optarg);
+            break;
+        case ':':
+            printf("SERVER: Please provide a valid port and search argument: -l -p\n");
+            return 0;
+            break;
+        case '?':
+            printf("SERVER: Unknown argument passed: %c\n", optopt);
+            return 0;
+            break;
+        default:
+            printf("SERVER: getopt returned character code 0%o?\n", opt);
+            return 0;
+            break;
+        }
+    }
+    printf("SERVER: Given arguments, port:%d search term:%s", portNum, searchTerm);
     
     //initialise head of linked list
     struct Node *head = (struct Node*) malloc(sizeof(Node));
-
 
     // Server address nonsense
     struct sockaddr_in serverAddress;
@@ -25,7 +58,7 @@ int main(){
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
     // TODO: Command line read port number not hardcode lol
-    serverAddress.sin_port = htons(PORT_NUM);
+    serverAddress.sin_port = htons(portNum);
 
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0){

@@ -44,7 +44,8 @@ int main(int argc, char* const *argv){
             break;
         }
     }
-    printf("SERVER: Given arguments, port:%d search term:%s", portNum, searchTerm);
+
+    printf("SERVER: Port: %d Search Term: %s\n", portNum, searchTerm);
     
     //initialise head of linked list
     struct Node *head = (struct Node*) malloc(sizeof(Node));

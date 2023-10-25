@@ -13,6 +13,9 @@
 #include <bits/getopt_posix.h>
 
 #define MAX_LINE 10000
+#define TRUE 1
+#define FALSE 0
+#define MAX_CLIENTS 20
 
 int main(int argc, char* const *argv){
 
@@ -52,12 +55,20 @@ int main(int argc, char* const *argv){
     
     //initialise head of linked list
     struct Node *head = (struct Node*) malloc(sizeof(Node));
+    // Creating an array of head of books
+    struct Node *bookHeads[MAX_CLIENTS];
+    for (int i = 0; i < MAX_CLIENTS; i++){
+        bookHeads[i] = (struct Node*) malloc(sizeof(Node));
+    }
 
     //create select stuff
-    int master_socket, client_socket[20], max_clients = 20;
+    int client_socket[MAX_CLIENTS], max_sd = 0, sd = 0, activity = 0;
+    for (int i = 0; i < MAX_CLIENTS; i++){
+        client_socket[i] = 0;
+    }
 
     //socket descriptors
-    fd_set
+    fd_set socket_set;
 
     // Server address nonsense
     struct sockaddr_in serverAddress;
@@ -67,16 +78,16 @@ int main(int argc, char* const *argv){
 
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
-    // TODO: Command line read port number not hardcode lol
     serverAddress.sin_port = htons(portNum);
 
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0){
-        printf("SERVER: socket creation error: %d\n", sock);
+    // Creating master server socket
+    int master_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (master_socket < 0){
+        printf("SERVER: socket creation error: %d\n", master_socket);
         return 0;
     }
 
-    int errorStatus = bind(sock, (struct sockaddr *) &serverAddress, sizeof(serverAddress));
+    int errorStatus = bind(master_socket, (struct sockaddr *) &serverAddress, sizeof(serverAddress));
     if (errorStatus < 0){
         printf("SERVER: bind error: %d\n", errorStatus);
         perror("Error: ");
@@ -84,48 +95,108 @@ int main(int argc, char* const *argv){
     }
 
     // Have up to 5 no. of connections that can be waiting
-    // before system poops
-    int status = listen(sock, 5);
+    int status = listen(master_socket, 5);
     if (status < 0){
-        printf("SERVER: listen error: %d\n", errorStatus);
+        printf("SERVER: listen error: %d\n", status);
         return 0;
     }
 
-    // Just use server address again lol because client and
-    // server are running on same machine
-    socklen_t clientLen = sizeof(serverAddress);
-    int newSock = accept(sock, (struct sockaddr *) &serverAddress, &clientLen);
-    if (newSock < 0){
-        printf("SERVER: accept error: %d\n", errorStatus);
-        return 0;
-    }
-
-    // GO GO CREATE NEW THREAD for each client connection :)
-    
     char buffer[MAX_LINE];
-    while (1){
-        bzero(buffer, MAX_LINE);
-        int readStatus = read(newSock, buffer, MAX_LINE);
-        if (readStatus < 0){
-            printf("SERVER: read error: %d\n", readStatus);
-            return 0;
-        } else if (readStatus == 0){
-            printf("SERVER: REACHED EOF!\n");
-            break;
+    
+    while (TRUE){
+        // Clear set of sockets
+        FD_ZERO(&socket_set);
+
+        // Add master socket to set of sockets
+        FD_SET(master_socket, &socket_set);
+        max_sd = master_socket;
+
+        for (int i = 0; i < MAX_CLIENTS; i++){
+            sd = client_socket[i];
+
+            // if socket descriptor is an actual socket descriptor, then add to socket set
+            if (sd > 0){
+                FD_SET(sd, &socket_set);
+            }
+            
+            // update max socket descriptor number for select() function
+            if (sd > max_sd){
+                max_sd = sd;
+            }    
         }
 
-        // printf("SERVER: Buffer content: %s\n", buffer);
-        if(head->text == NULL){
-            head->text = strdup(buffer); //<-- clutch
-        } else {
-            struct Node* newNode = (struct Node*) malloc(sizeof(Node));
-            newNode->text = strdup(buffer);
-            // printf("%s", newNode->text);
+        // Actually selecting which socket to accept (select() function does its magic here)
+        // Timeout is set to NULL, server will wait forever for a client connection
+        activity = select(max_sd + 1, &socket_set, NULL, NULL, NULL);
 
-            addNode(head, newNode);
+        if (activity < 0){
+            printf("SERVER: select error: %d\n", activity);
+            return 0;
+        }
+        
+        // Detecting if there is an incoming client connection
+        if (FD_ISSET(master_socket, &socket_set)){
+            socklen_t clientLen = sizeof(serverAddress);
+            // Just use server address again lol because client and
+            // server are running on same machine
+            int newSock = accept(master_socket, (struct sockaddr *) &serverAddress, &clientLen);
+            if (newSock < 0){
+                printf("SERVER: accept error: %d\n", errorStatus);
+                return 0;
+            }
+
+            printf("SERVER: New connection, fd = %d\n", newSock);
+
+            // Add new socket to socket array
+            for (int i = 0; i < MAX_CLIENTS; i++){
+                // Finding an empty spot
+                if (client_socket[i] == 0){
+                    client_socket[i] = newSock;
+                    printf("SERVER: Adding client to socket array: %d, index:%d\n", client_socket[i], i);
+
+                    // Creating head node for this client's book
+                    struct Node *bookHead = (struct Node*) malloc(sizeof(Node));
+
+                    break;
+                }
+            }
+        }
+        
+        // Going through every client and reading a line of the client's book
+        for (int i = 0; i < MAX_CLIENTS; i++){
+            int currentSocket = client_socket[i];
+
+            if (FD_ISSET(currentSocket, &socket_set)){
+                // Zero out the buffer
+                bzero(buffer, MAX_LINE);
+                int readStatus = read(currentSocket, buffer, MAX_LINE);
+                // Checking for read error
+                if (readStatus < 0){
+                    printf("SERVER: read error: %d\n", readStatus);
+                    return 0;
+                // Checking for end of file
+                } else if (readStatus == 0){
+                    printf("SERVER: REACHED EOF!\n");
+                    close(currentSocket);
+                    client_socket[i] = 0;
+                    printList(head);
+                // Else, add the client's data to the server
+                } else {
+                    // printf("SERVER: Buffer content: %s\n", buffer);
+                    if(head->text == NULL){
+                        head->text = strdup(buffer); //<-- clutch
+                    } else {
+                        struct Node* newNode = (struct Node*) malloc(sizeof(Node));
+                        newNode->text = strdup(buffer);
+                        // printf("%s", newNode->text);
+
+                        addNode(head, newNode);
+                        printf("SERVER: Added node from socket:%d\n", currentSocket);
+                    }
+                }
+            }   
         }
     }
-    printList(head);
     
 
     printf("SERVER: Done returning 0\n");

@@ -60,12 +60,22 @@ int main(int argc, char* const *argv){
     for (int i = 0; i < MAX_CLIENTS; i++){
         bookHeads[i] = (struct Node*) malloc(sizeof(Node));
     }
+    // Creating an array of end of books
+    // struct Node *bookEnds[MAX_CLIENTS];
+    // for (int i = 0; i < MAX_CLIENTS; i++){
+    //     bookEnds[i] = (struct Node*) malloc(sizeof(Node));
+    // }
 
     //create select stuff
     int client_socket[MAX_CLIENTS], max_sd = 0, sd = 0, activity = 0;
     for (int i = 0; i < MAX_CLIENTS; i++){
         client_socket[i] = 0;
     }
+    int clientIDs[MAX_CLIENTS];
+    for(int i = 0; i< MAX_CLIENTS; i++){
+        clientIDs[i] = 0;
+    }
+    int connectionNumber = 0;
 
     //socket descriptors
     fd_set socket_set;
@@ -102,7 +112,7 @@ int main(int argc, char* const *argv){
     }
 
     char buffer[MAX_LINE];
-    
+ 
     while (TRUE){
         // Clear set of sockets
         FD_ZERO(&socket_set);
@@ -140,6 +150,9 @@ int main(int argc, char* const *argv){
             // Just use server address again lol because client and
             // server are running on same machine
             int newSock = accept(master_socket, (struct sockaddr *) &serverAddress, &clientLen);
+            connectionNumber++;
+            
+
             if (newSock < 0){
                 printf("SERVER: accept error: %d\n", errorStatus);
                 return 0;
@@ -152,10 +165,9 @@ int main(int argc, char* const *argv){
                 // Finding an empty spot
                 if (client_socket[i] == 0){
                     client_socket[i] = newSock;
+                    clientIDs[i] = connectionNumber;
+                    
                     printf("SERVER: Adding client to socket array: %d, index:%d\n", client_socket[i], i);
-
-                    // Creating head node for this client's book
-                    struct Node *bookHead = (struct Node*) malloc(sizeof(Node));
 
                     break;
                 }
@@ -166,10 +178,12 @@ int main(int argc, char* const *argv){
         for (int i = 0; i < MAX_CLIENTS; i++){
             int currentSocket = client_socket[i];
 
+            printf("FD_ISSET:%d\n", FD_ISSET(currentSocket, &socket_set));
             if (FD_ISSET(currentSocket, &socket_set)){
                 // Zero out the buffer
                 bzero(buffer, MAX_LINE);
                 int readStatus = read(currentSocket, buffer, MAX_LINE);
+                printf("Read status:%d\n", readStatus);
                 // Checking for read error
                 if (readStatus < 0){
                     printf("SERVER: read error: %d\n", readStatus);
@@ -177,18 +191,85 @@ int main(int argc, char* const *argv){
                 // Checking for end of file
                 } else if (readStatus == 0){
                     printf("SERVER: REACHED EOF!\n");
-                    close(currentSocket);
+                    
                     client_socket[i] = 0;
-                    printList(head);
+                    //printList(head);
+                    int bookNum = clientIDs[i];
+                    char fileName[50] = "";
+                    if (bookNum < 10){
+                        sprintf(fileName,"book_0%d.txt",bookNum);
+                    } else {
+                        sprintf(fileName,"book_%d.txt",bookNum);
+                    }
+                    //write to file
+                    FILE *file = fopen(fileName,"a");
+
+
+                    struct Node* currentNode = bookHeads[i];
+                    printf("FINAL WHILE LOOP\n");
+                    while(currentNode->book_next != NULL){
+                       //int fileStatus = fputs(currentNode->text,file); 
+                       
+                       printf("%s",currentNode->text);
+                        /*if (fileStatus < 0){
+                            printf("SERVER: file write error: %d\n", fileStatus);
+                            return 0;
+                        }*/
+                        currentNode = currentNode->book_next;
+                    }
+                    fclose(file);
+                    close(currentSocket);
                 // Else, add the client's data to the server
                 } else {
+                    struct Node* newNode = (struct Node*) malloc(sizeof(Node));
+                        
+                    newNode->text = strdup(buffer);
+                    newNode->book_next = NULL;
+                    newNode->next = NULL;
                     // printf("SERVER: Buffer content: %s\n", buffer);
+
+                    printf("Head text: %s\n",head->text);
                     if(head->text == NULL){
-                        head->text = strdup(buffer); //<-- clutch
+                        head = newNode; //<-- clutch
+                        //head->book_prev = NULL;
+                        bookHeads[i] = head;
+                        printf("created head node\n");
+                        //printf("%s", head->text);
                     } else {
-                        struct Node* newNode = (struct Node*) malloc(sizeof(Node));
-                        newNode->text = strdup(buffer);
-                        // printf("%s", newNode->text);
+
+                         printf("Book head text: %s\n",bookHeads[i]->text);
+                        //if starting new book, keep track of book head node
+                        if (bookHeads[i]->text == NULL){
+                            bookHeads[i] = newNode;
+                            //newNode->book_prev = NULL;
+                            // bookEnds[i] = newNode;
+                            
+                        } else {
+                            struct Node* currentNode = bookHeads[i];
+                            printf("printing:\n");
+                            while (currentNode->book_next != NULL){
+                                printf("%s",currentNode->text);
+                                currentNode = currentNode->book_next;
+                            }
+                            printf("end node:\n");
+                            printf("%s",currentNode->text);
+                            currentNode->book_next = newNode;
+
+                            // newNode->book_prev = currentNode;
+                            
+                            // bookEnds[i]->book_next = newNode;
+                            // bookEnds[i] = newNode;
+                            
+                            // if (bookHeads[i]->book_next == NULL){
+                            //     bookHeads[i]->book_next = bookEnds[i];
+                            // }
+
+                        }
+                        
+                        
+
+
+                        //printf("%s", newNode->text);
 
                         addNode(head, newNode);
                         printf("SERVER: Added node from socket:%d\n", currentSocket);

@@ -16,6 +16,9 @@ typedef struct Node
     // links to the next item in the same book. 
     struct Node *book_next;
 
+    // links to the previous item in the same book. 
+    // struct Node *book_prev;
+
     // for part two search, links to the next item that had the search terms
     struct Node *next_frequent_search;
 

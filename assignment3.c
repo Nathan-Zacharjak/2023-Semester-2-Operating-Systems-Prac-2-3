@@ -6,6 +6,8 @@
 #include <netinet/in.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/time.h>
+
 // Including this just so intellisense works in VSCode, but it should work with this commented out
 // (It should be included as part of unistd.h but I was having difficulties...)
 #include <bits/getopt_posix.h>
@@ -13,6 +15,7 @@
 #define MAX_LINE 10000
 
 int main(int argc, char* const *argv){
+
     // Reading the given arguments to run the server
     int portNum = 0;
     char* searchTerm = "";
@@ -49,6 +52,12 @@ int main(int argc, char* const *argv){
     
     //initialise head of linked list
     struct Node *head = (struct Node*) malloc(sizeof(Node));
+
+    //create select stuff
+    int master_socket, client_socket[20], max_clients = 20;
+
+    //socket descriptors
+    fd_set
 
     // Server address nonsense
     struct sockaddr_in serverAddress;

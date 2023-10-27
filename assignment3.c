@@ -126,9 +126,9 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
         }
 
         bzero(buffer, MAX_LINE);
-        printf("READ STATUS %d\n", readStatus);
+        // printf("READ STATUS %d\n", readStatus);
     }
-    printf("READ STATUS %d\n", readStatus);
+    // printf("READ STATUS %d\n", readStatus);
     if (readStatus < 0){
         // printf("SERVER: read error: %d\n", readStatus);
     } else if (readStatus == 0){

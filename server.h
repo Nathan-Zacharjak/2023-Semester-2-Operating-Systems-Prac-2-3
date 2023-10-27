@@ -42,10 +42,24 @@ void addNode(Node *head, Node *newNode) {
 // function that prints out book text in linked list
 void printList(Node *head){
     Node *iter = head;
-
+    int i = 0;
     while (iter != NULL){
-        printf("%s", iter->text);
+        printf("%s\n", iter->text);
         iter = iter->next;
+        i++;
+    }
+    printf("length of linked list : %d\n", i);
+}
+
+//function that prints books by book_next
+void printBooks(Node **bookHead){
+    for (int i=0; i<20; i++){
+        Node *iter = bookHead[i];
+        printf("Book number %d:\n", i);
+        while (iter !=NULL){
+            printf("%s\n", iter->text);
+            iter = iter->book_next;
+        }
     }
 }
 

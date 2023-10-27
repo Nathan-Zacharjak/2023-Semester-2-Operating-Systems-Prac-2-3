@@ -91,29 +91,42 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     while ((readStatus = read(newSocket, buffer, MAX_LINE))){
         struct Node* newNode = (struct Node*)malloc(sizeof(Node));
         newNode->text = strdup(buffer);
-        // printf("%p\n%s\n", head, head->text);
+        newNode->next = NULL;
+        newNode->book_next = NULL;
+        // printf("%p\n%s\n", newNode, newNode->text);
 
+        // First ever line from the first book
         if (head->text == NULL){
+            // printf("THE START OF SUMN NEW HEHEHEE\n");
             head->text = strdup(buffer);
             bookHeads[bookInd] = newNode;
             prevNode = bookHeads[bookInd];
             // printf("SERVER: started head of linked list\n");
         } else {
+            // printf("CONTINUED DILEMNA\n");
+            // The first line from a book, that is not the very first book
             if (bookHeads[bookInd]->text==NULL){
+                // printf("FIrst line from book that aint the very first book,, ehee\n");
                 bookHeads[bookInd] = newNode;
                 prevNode = bookHeads[bookInd];
                 addNode(head,newNode);
             } else {
+                // printf("THE OTHER BOOKLINES,, ehee\n");
+                // All other book lines
+                // printf("line 1\n");
                 prevNode->book_next = newNode;
+                // printf("line 2\n");
                 addNode(head, newNode);
+                // printf("line 3\n");
                 prevNode = (struct Node*)malloc(sizeof(Node));
+                // printf("line 4\n");
                 prevNode = newNode;
             }
             printf("SERVER: added node to linked list\n");
         }
 
         bzero(buffer, MAX_LINE);
-        //printf("READ STATUS %d\n", readStatus);
+        //// printf("READ STATUS %d\n", readStatus);
     }
 
     if (readStatus < 0){
@@ -167,7 +180,7 @@ int main(int argc, char* const *argv){
 
     // Reading the given arguments to run the server
     int portNum = 0;
-    char* searchTerm = "";
+    // char* searchTerm = "";
     // Used for reading arguments
     int opt = 0;
 
@@ -180,7 +193,7 @@ int main(int argc, char* const *argv){
             portNum = atoi(optarg);
             break;
         case 'p':
-            searchTerm = strdup(optarg);
+            // searchTerm = strdup(optarg);
             break;
         case ':':
             // printf("SERVER: Please provide a valid port and search argument: -l -p\n");
@@ -241,7 +254,7 @@ int main(int argc, char* const *argv){
         //check ready client sockets 
         for (int i=0; i<=maxSocket; i++){
 
-            //printf("i: %d\n", i);
+            //// printf("i: %d\n", i);
 
             if (FD_ISSET(i, &readSockets)){
                 //new client connection made to server

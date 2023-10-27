@@ -27,16 +27,21 @@ typedef struct Node
 
 // function that adds a new node to the end of a linked list
 void addNode(Node *head, Node *newNode) {
-    Node *iter = head;
+    Node *node = head;
+    // printf("Initialisation works! %p %p\n", head, newNode);
 
-    // iterate over linked list to find the end
-    while (iter->next != NULL){
-        iter = iter->next;
+    // nodeate over linked list to find the end
+    int nodeCount = 0;
+    while (node->next != NULL){
+        nodeCount++;
+        // printf("Processing loop... %p %d\n", node, nodeCount);
+        node = node->next;
     }
+    // printf("Loopdyloop is done :3\n");
 
     // adde new node to end of linked list
-    iter->next = newNode;
-    // printf("SERVER: added node to linked list\n");
+    node->next = newNode;
+    // printf("FIN\n");
 }
 
 
@@ -45,20 +50,20 @@ void printList(Node *head){
     Node *iter = head;
     int i = 0;
     while (iter != NULL){
-        printf("%s\n", iter->text);
+        // printf("%s\n", iter->text);
         iter = iter->next;
         i++;
     }
-    printf("length of linked list : %d\n", i);
+    // printf("length of linked list : %d\n", i);
 }
 
 //function that prints books by book_next
 void printBooks(Node **bookHeads){
     for (int i=0; i<20; i++){
         Node *iter = bookHeads[i];
-        printf("Book number %d:\n", i+1);
+        // printf("Book number %d:\n", i+1);
         while (iter !=NULL){
-            printf("%p\n%s\n", iter->book_next, iter->text);
+            // printf("%p\n%s\n", iter->book_next, iter->text);
             iter = iter->book_next;
         }
     }

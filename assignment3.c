@@ -109,6 +109,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
                 prevNode = (struct Node*)malloc(sizeof(Node));
                 prevNode = newNode;
             }
+            printf("SERVER: added node to linked list\n");
         }
 
         bzero(buffer, MAX_LINE);

@@ -36,7 +36,7 @@ void addNode(Node *head, Node *newNode) {
 
     // adde new node to end of linked list
     iter->next = newNode;
-    printf("SERVER: added node to linked list\n");
+    // printf("SERVER: added node to linked list\n");
 }
 
 

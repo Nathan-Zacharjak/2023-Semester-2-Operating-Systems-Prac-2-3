@@ -144,11 +144,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
 
     //write to file
     char fileName[50] = "";
-    if (connectionNum < 10){
-        sprintf(fileName,"book_0%d.txt",connectionNum);
-    } else {
-        sprintf(fileName,"book_%d.txt",connectionNum);
-    }
+    sprintf(fileName,"book_%d.txt",connectionNum);
 
     FILE *file = fopen(fileName,"a");
     struct Node* currentNode = bookHeads[bookInd];

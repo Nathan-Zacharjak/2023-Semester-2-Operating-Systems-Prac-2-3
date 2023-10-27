@@ -126,9 +126,9 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
         }
 
         bzero(buffer, MAX_LINE);
-        //// printf("READ STATUS %d\n", readStatus);
+        printf("READ STATUS %d\n", readStatus);
     }
-
+    printf("READ STATUS %d\n", readStatus);
     if (readStatus < 0){
         // printf("SERVER: read error: %d\n", readStatus);
     } else if (readStatus == 0){
@@ -244,7 +244,8 @@ int main(int argc, char* const *argv){
         readSockets = connectedSockets;
 
         //using select, timeout set to NULL 
-        int activity = select(FD_SETSIZE, &readSockets, NULL, NULL, NULL);
+        struct timeval tv = {5, 0};   
+        int activity = select(FD_SETSIZE, &readSockets, NULL, NULL, &tv);
 
         if (activity < 0){
             // printf("SERVER: select error %d\n", activity);

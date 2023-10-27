@@ -76,44 +76,44 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     char buffer[MAX_LINE];
     bzero(buffer, MAX_LINE);
     int readStatus;
-    //int bookInd;
+    int bookInd = 0;
 
-    //find spot to put book in bookheads
-    /*for (int i=0; i<MAX_CLIENTS; i++){
+    // find spot to put book in bookheads
+    for (int i=0; i<MAX_CLIENTS; i++){
         if (bookHeads[i]->text == NULL){
             bookInd = i;
             break;
         }
-    }*/
+    }
 
-    //struct Node* prevNode = (struct Node*)malloc(sizeof(Node));
+    struct Node* prevNode = (struct Node*)malloc(sizeof(Node));
 
     while ((readStatus = read(newSocket, buffer, MAX_LINE))){
         struct Node* newNode = (struct Node*)malloc(sizeof(Node));
         newNode->text = strdup(buffer);
+        printf("%p\n%s\n", head, head->text);
 
         if (head->text == NULL){
             head->text = strdup(buffer);
-            //head = newNode;
-            //bookHeads[bookInd] = newNode;
+            bookHeads[bookInd] = newNode;
+            prevNode = bookHeads[bookInd];
             printf("SERVER: started head of linked list\n");
         } else {
-            /*if (bookHeads[bookInd]->text==NULL){
+            if (bookHeads[bookInd]->text==NULL){
                 bookHeads[bookInd] = newNode;
                 prevNode = newNode;
                 addNode(head,newNode);
-            }*/
-            
-            //prevNode->book_next = newNode;
-            addNode(head, newNode);
-            //struct Node* prevNode = (struct Node*)malloc(sizeof(Node));
-            //prevNode = newNode;
-            printf("SERVER: added node to linked list\n");
-
+            } else {
+                prevNode->book_next = newNode;
+                addNode(head, newNode);
+                prevNode = (struct Node*)malloc(sizeof(Node));
+                prevNode = newNode;
+            }
         }
 
         bzero(buffer, MAX_LINE);
         //printf("READ STATUS %d\n", readStatus);
+        // free(newNode);
     }
 
     if (readStatus < 0){
@@ -126,6 +126,8 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     printf("SERVER: closing connection to client num %d\n", connectionNum);
     printf("PRINTING LINKED LIST: \n");
     printList(head);
+    printf("SERVER: Printing book\n");
+    printBooks(bookHeads);
 }
 
 

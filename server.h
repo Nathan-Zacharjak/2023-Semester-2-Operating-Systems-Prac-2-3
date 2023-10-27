@@ -36,6 +36,7 @@ void addNode(Node *head, Node *newNode) {
 
     // adde new node to end of linked list
     iter->next = newNode;
+    printf("SERVER: added node to linked list\n");
 }
 
 
@@ -52,12 +53,12 @@ void printList(Node *head){
 }
 
 //function that prints books by book_next
-void printBooks(Node **bookHead){
+void printBooks(Node **bookHeads){
     for (int i=0; i<20; i++){
-        Node *iter = bookHead[i];
-        printf("Book number %d:\n", i);
+        Node *iter = bookHeads[i];
+        printf("Book number %d:\n", i+1);
         while (iter !=NULL){
-            printf("%s\n", iter->text);
+            printf("%p\n%s\n", iter->book_next, iter->text);
             iter = iter->book_next;
         }
     }

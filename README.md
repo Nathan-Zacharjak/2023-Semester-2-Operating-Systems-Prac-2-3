@@ -13,3 +13,4 @@ or `make server`.
 In another terminal window we compiled the client with: `gcc -Wall -O3 -o client client.c`
 and ran the client with: `./client -l 1234 -b [Book number]`
 or `make client[Book number]`.
+which uses the netcat command: `nc localhost %d -i [Book number] < input/book[Book number].txt -N`

@@ -91,7 +91,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     while ((readStatus = read(newSocket, buffer, MAX_LINE))){
         struct Node* newNode = (struct Node*)malloc(sizeof(Node));
         newNode->text = strdup(buffer);
-        printf("%p\n%s\n", head, head->text);
+        // printf("%p\n%s\n", head, head->text);
 
         if (head->text == NULL){
             head->text = strdup(buffer);
@@ -101,7 +101,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
         } else {
             if (bookHeads[bookInd]->text==NULL){
                 bookHeads[bookInd] = newNode;
-                prevNode = newNode;
+                prevNode = bookHeads[bookInd];
                 addNode(head,newNode);
             } else {
                 prevNode->book_next = newNode;
@@ -113,7 +113,6 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
 
         bzero(buffer, MAX_LINE);
         //printf("READ STATUS %d\n", readStatus);
-        // free(newNode);
     }
 
     if (readStatus < 0){
@@ -124,10 +123,41 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
 
     close(newSocket);
     printf("SERVER: closing connection to client num %d\n", connectionNum);
-    printf("PRINTING LINKED LIST: \n");
-    printList(head);
-    printf("SERVER: Printing book\n");
-    printBooks(bookHeads);
+    // printf("PRINTING LINKED LIST: \n");
+    // printList(head);
+    // printf("SERVER: Printing book\n");
+    // printBooks(bookHeads);
+
+    //write to file
+    char fileName[50] = "";
+    if (connectionNum < 10){
+        sprintf(fileName,"book_0%d.txt",connectionNum);
+    } else {
+        sprintf(fileName,"book_%d.txt",connectionNum);
+    }
+
+    FILE *file = fopen(fileName,"a");
+    struct Node* currentNode = bookHeads[bookInd];
+
+    while(currentNode->book_next != NULL){
+        int fileStatus = fputs(currentNode->text,file); 
+                       
+        if (fileStatus < 0){
+            printf("SERVER: file write error: %d\n", fileStatus);
+            return;
+        }
+
+        currentNode = currentNode->book_next;
+    }
+
+    int fileStatus = fputs(currentNode->text,file); 
+
+    if (fileStatus < 0){
+        printf("SERVER: file write error: %d\n", fileStatus);
+        return;
+    }
+
+    fclose(file);
 }
 
 

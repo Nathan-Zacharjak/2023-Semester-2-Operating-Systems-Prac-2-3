@@ -29,14 +29,14 @@ int startServer(int port){
     // Creating server socket
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0){
-        printf("SERVER: socket creation error: %d\n", serverSocket);
+        // printf("SERVER: socket creation error: %d\n", serverSocket);
         return 0;
     }
 
     //bind server socket 
     int errorStatus = bind(serverSocket, (struct sockaddr *) &serverAddress, sizeof(serverAddress));
     if (errorStatus < 0){
-        printf("SERVER: bind error: %d\n", errorStatus);
+        // printf("SERVER: bind error: %d\n", errorStatus);
         perror("Error: ");
         return 0;
     }
@@ -44,11 +44,11 @@ int startServer(int port){
     // Have up to 10 no. of connections that can be waiting
     int status = listen(serverSocket, 10);
     if (status < 0){
-        printf("SERVER: listen error: %d\n", status);
+        // printf("SERVER: listen error: %d\n", status);
         return 0;
     }
 
-    printf("SERVER STARTED\n");
+    // printf("SERVER STARTED\n");
 
     return serverSocket;
 
@@ -62,10 +62,10 @@ int acceptConnection(int serverSocket){
     int newSocket = accept(serverSocket, (struct sockaddr *) &clientAddress, (socklen_t*)&clientLen);
     
     if (newSocket < 0){
-        printf("SERVER: accept error: %d\n", newSocket);
+        // printf("SERVER: accept error: %d\n", newSocket);
         return 0;
     } 
-    printf("SERVER: accepted new connection\n");
+    // printf("SERVER: accepted new connection\n");
 
     return newSocket;
 }
@@ -97,7 +97,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
             head->text = strdup(buffer);
             bookHeads[bookInd] = newNode;
             prevNode = bookHeads[bookInd];
-            printf("SERVER: started head of linked list\n");
+            // printf("SERVER: started head of linked list\n");
         } else {
             if (bookHeads[bookInd]->text==NULL){
                 bookHeads[bookInd] = newNode;
@@ -116,13 +116,13 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     }
 
     if (readStatus < 0){
-        printf("SERVER: read error: %d\n", readStatus);
+        // printf("SERVER: read error: %d\n", readStatus);
     } else if (readStatus == 0){
-        printf("Server: client reached EOF! \n");
+        // printf("Server: client reached EOF! \n");
     }
 
     close(newSocket);
-    printf("SERVER: closing connection to client num %d\n", connectionNum);
+    // printf("SERVER: closing connection to client num %d\n", connectionNum);
     // printf("PRINTING LINKED LIST: \n");
     // printList(head);
     // printf("SERVER: Printing book\n");
@@ -143,7 +143,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
         int fileStatus = fputs(currentNode->text,file); 
                        
         if (fileStatus < 0){
-            printf("SERVER: file write error: %d\n", fileStatus);
+            // printf("SERVER: file write error: %d\n", fileStatus);
             return;
         }
 
@@ -153,7 +153,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     int fileStatus = fputs(currentNode->text,file); 
 
     if (fileStatus < 0){
-        printf("SERVER: file write error: %d\n", fileStatus);
+        // printf("SERVER: file write error: %d\n", fileStatus);
         return;
     }
 
@@ -182,21 +182,21 @@ int main(int argc, char* const *argv){
             searchTerm = strdup(optarg);
             break;
         case ':':
-            printf("SERVER: Please provide a valid port and search argument: -l -p\n");
+            // printf("SERVER: Please provide a valid port and search argument: -l -p\n");
             return 0;
             break;
         case '?':
-            printf("SERVER: Unknown argument passed: %c\n", optopt);
+            // printf("SERVER: Unknown argument passed: %c\n", optopt);
             return 0;
             break;
         default:
-            printf("SERVER: getopt returned character code 0%o?\n", opt);
+            // printf("SERVER: getopt returned character code 0%o?\n", opt);
             return 0;
             break;
         }
     }
 
-    printf("SERVER: Port: %d Search Term: %s\n", portNum, searchTerm);
+    // printf("SERVER: Port: %d Search Term: %s\n", portNum, searchTerm);
     
     //initialise head of linked list
     struct Node *head = (struct Node*) malloc(sizeof(Node));
@@ -212,7 +212,7 @@ int main(int argc, char* const *argv){
     int serverSocket = startServer(portNum);
 
     int maxSocket = serverSocket;
-    printf("server socket: %d\n", maxSocket);
+    // printf("server socket: %d\n", maxSocket);
 
     //initialise socket sets for select 
     fd_set connectedSockets, readSockets;
@@ -233,7 +233,7 @@ int main(int argc, char* const *argv){
         int activity = select(FD_SETSIZE, &readSockets, NULL, NULL, NULL);
 
         if (activity < 0){
-            printf("SERVER: select error %d\n", activity);
+            // printf("SERVER: select error %d\n", activity);
             return 0;
         }
 
@@ -255,7 +255,7 @@ int main(int argc, char* const *argv){
 
                     //increment number of connections made
                     connectionNum++;
-                    printf("SERVER: connection number %d\n", connectionNum);
+                    // printf("SERVER: connection number %d\n", connectionNum);
 
                 } else {
                     //read book from connection

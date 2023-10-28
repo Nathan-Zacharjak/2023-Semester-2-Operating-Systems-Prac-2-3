@@ -87,8 +87,8 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     }
 
     struct Node* prevNode = (struct Node*)malloc(sizeof(Node));
-
-    while ((readStatus = read(newSocket, buffer, MAX_LINE))){
+    //readStatus = read(newSocket, buffer, MAX_LINE
+    while ((readStatus = recv(newSocket, buffer, MAX_LINE,0))){
         struct Node* newNode = (struct Node*)malloc(sizeof(Node));
         newNode->text = strdup(buffer);
         newNode->next = NULL;

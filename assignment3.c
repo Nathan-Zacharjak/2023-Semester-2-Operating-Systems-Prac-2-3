@@ -138,9 +138,9 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     close(newSocket);
     printf("SERVER: closing connection to client num %d\n", connectionNum);
     printf("PRINTING LINKED LIST: \n");
-    // printList(head);
+    printList(head);
     printf("SERVER: Printing book\n");
-    // printBooks(bookHeads);
+    printBooks(bookHeads);
 
     //write to file
     char fileName[50] = "";

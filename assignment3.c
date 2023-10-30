@@ -97,29 +97,29 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
 
         // First ever line from the first book
         if (head->text == NULL){
-            printf("THE START OF SUMN NEW HEHEHEE\n");
+            // printf("THE START OF SUMN NEW HEHEHEE\n");
             head->text = strdup(buffer);
             bookHeads[bookInd] = newNode;
             prevNode = bookHeads[bookInd];
-            printf("SERVER: started head of linked list\n");
+            // printf("SERVER: started head of linked list\n");
         } else {
-            printf("CONTINUED DILEMNA\n");
+            //printf("CONTINUED DILEMNA\n");
             // The first line from a book, that is not the very first book
             if (bookHeads[bookInd]->text==NULL){
-                printf("FIrst line from book that aint the very first book,, ehee\n");
+                //printf("FIrst line from book that aint the very first book,, ehee\n");
                 bookHeads[bookInd] = newNode;
                 prevNode = bookHeads[bookInd];
                 addNode(head,newNode);
             } else {
-                printf("THE OTHER BOOKLINES,, ehee\n");
+               // printf("THE OTHER BOOKLINES,, ehee\n");
                 // All other book lines
-                printf("line 1\n");
+                //printf("line 1\n");
                 prevNode->book_next = newNode;
-                printf("line 2\n");
+                //printf("line 2\n");
                 addNode(head, newNode);
-                printf("line 3\n");
+                //printf("line 3\n");
                 prevNode = (struct Node*)malloc(sizeof(Node));
-                printf("line 4\n");
+                //printf("line 4\n");
                 prevNode = newNode;
             }
             printf("SERVER: added node to linked list\n");

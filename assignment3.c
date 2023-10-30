@@ -284,6 +284,8 @@ int main(int argc, char* const *argv){
         }
     }
 
+    printList(head);
+
     return 0;
 
 }

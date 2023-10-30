@@ -50,20 +50,20 @@ void printList(Node *head){
     Node *iter = head;
     int i = 0;
     while (iter != NULL){
-        // printf("%s\n", iter->text);
+        printf("%s\n", iter->text);
         iter = iter->next;
         i++;
     }
-    // printf("length of linked list : %d\n", i);
+    printf("length of linked list : %d\n", i);
 }
 
 //function that prints books by book_next
 void printBooks(Node **bookHeads){
     for (int i=0; i<20; i++){
         Node *iter = bookHeads[i];
-        // printf("Book number %d:\n", i+1);
+        printf("Book number %d:\n", i+1);
         while (iter !=NULL){
-            // printf("%p\n%s\n", iter->book_next, iter->text);
+            printf("%p\n%s\n", iter->book_next, iter->text);
             iter = iter->book_next;
         }
     }

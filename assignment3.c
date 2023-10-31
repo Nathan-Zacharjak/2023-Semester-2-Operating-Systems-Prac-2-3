@@ -29,23 +29,23 @@ int startServer(int port){
     // Creating server socket
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0){
-        printf("SERVER: socket creation error: %d\n", serverSocket);
-        return 0;
+        perror("SERVER: socket creation error");
+        exit(1);
     }
 
     //bind server socket 
     int errorStatus = bind(serverSocket, (struct sockaddr *) &serverAddress, sizeof(serverAddress));
     if (errorStatus < 0){
-        printf("SERVER: bind error: %d\n", errorStatus);
-        perror("Error: ");
-        return 0;
+        perror("SERVER: bind error");
+        //perror("Error: ");
+        exit(1);
     }
 
     // Have up to 10 no. of connections that can be waiting
     int status = listen(serverSocket, 10);
     if (status < 0){
-        printf("SERVER: listen error: %d\n", status);
-        return 0;
+        perror("SERVER: listen error");
+        exit(1);
     }
 
     printf("SERVER STARTED\n");
@@ -130,7 +130,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     }
     //printf("READ STATUS %d\n", readStatus);
     if (readStatus < 0){
-        printf("SERVER: read error: %d\n", readStatus);
+        perror("SERVER: read error");
     } else if (readStatus == 0){
         printf("Server: client reached EOF! \n");
     }

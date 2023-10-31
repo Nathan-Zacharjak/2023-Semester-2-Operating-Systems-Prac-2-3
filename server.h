@@ -54,7 +54,7 @@ void printList(Node *head){
         iter = iter->next;
         i++;
     }
-    printf("length of linked list : %d\n", i);
+    printf("\nlength of linked list : %d\n", i);
 }
 
 //function that prints books by book_next

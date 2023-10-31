@@ -34,3 +34,5 @@ compclient2: client.c
 # b = book number
 runclient2: client
 	./client -l 1234 -b 2
+
+clients: client1 client2

@@ -50,7 +50,7 @@ void printList(Node *head){
     Node *iter = head;
     int i = 0;
     while (iter != NULL){
-        printf("%s\n", iter->text);
+        printf("%s", iter->text);
         iter = iter->next;
         i++;
     }

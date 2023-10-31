@@ -93,7 +93,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
         newNode->text = strdup(buffer);
         newNode->next = NULL;
         newNode->book_next = NULL;
-        printf("%p\n%s\n", newNode, newNode->text);
+        //printf("%p\n%s\n", newNode, newNode->text);
 
         // First ever line from the first book
         if (head->text == NULL){
@@ -122,13 +122,13 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
                 //printf("line 4\n");
                 prevNode = newNode;
             }
-            printf("SERVER: added node to linked list\n");
+            //printf("SERVER: added node to linked list\n");
         }
 
         bzero(buffer, MAX_LINE);
-        printf("READ STATUS %d\n", readStatus);
+        //printf("READ STATUS %d\n", readStatus);
     }
-    printf("READ STATUS %d\n", readStatus);
+    //printf("READ STATUS %d\n", readStatus);
     if (readStatus < 0){
         printf("SERVER: read error: %d\n", readStatus);
     } else if (readStatus == 0){
@@ -136,11 +136,11 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     }
 
     close(newSocket);
-    printf("SERVER: closing connection to client num %d\n", connectionNum);
-    printf("PRINTING LINKED LIST: \n");
+    //printf("SERVER: closing connection to client num %d\n", connectionNum);
+    //printf("PRINTING LINKED LIST: \n");
     printList(head);
-    printf("SERVER: Printing book\n");
-    printBooks(bookHeads);
+    //printf("SERVER: Printing book\n");
+    //printBooks(bookHeads);
 
     //write to file
     char fileName[50] = "";

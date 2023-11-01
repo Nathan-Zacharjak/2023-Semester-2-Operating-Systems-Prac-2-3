@@ -88,12 +88,12 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
 
     struct Node* prevNode = (struct Node*)malloc(sizeof(Node));
     //readStatus = read(newSocket, buffer, MAX_LINE
-    while ((readStatus = recv(newSocket, buffer, MAX_LINE,0))){
+    while ((readStatus = read(newSocket, buffer, MAX_LINE))){
         struct Node* newNode = (struct Node*)malloc(sizeof(Node));
         newNode->text = strdup(buffer);
         newNode->next = NULL;
         newNode->book_next = NULL;
-        //printf("%p\n%s\n", newNode, newNode->text);
+        printf("%s\n", newNode->text);
 
         // First ever line from the first book
         if (head->text == NULL){
@@ -110,19 +110,20 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
                 bookHeads[bookInd] = newNode;
                 prevNode = bookHeads[bookInd];
                 addNode(head,newNode);
+                printf("line 1\n");
             } else {
-               // printf("THE OTHER BOOKLINES,, ehee\n");
+                // printf("THE OTHER BOOKLINES,, ehee\n");
                 // All other book lines
-                //printf("line 1\n");
+                printf("line 1\n");
                 prevNode->book_next = newNode;
-                //printf("line 2\n");
+                printf("line 2\n");
                 addNode(head, newNode);
-                //printf("line 3\n");
+                printf("line 3\n");
                 prevNode = (struct Node*)malloc(sizeof(Node));
-                //printf("line 4\n");
+                printf("line 4\n");
                 prevNode = newNode;
             }
-            //printf("SERVER: added node to linked list\n");
+            printf("SERVER: added node to linked list\n");
         }
 
         bzero(buffer, MAX_LINE);
@@ -138,7 +139,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     close(newSocket);
     //printf("SERVER: closing connection to client num %d\n", connectionNum);
     //printf("PRINTING LINKED LIST: \n");
-    printList(head);
+    //printList(head);
     //printf("SERVER: Printing book\n");
     //printBooks(bookHeads);
 
@@ -226,7 +227,7 @@ int main(int argc, char* const *argv){
     int serverSocket = startServer(portNum);
 
     int maxSocket = serverSocket;
-    printf("server socket: %d\n", maxSocket);
+    //printf("server socket: %d\n", maxSocket);
 
     //initialise socket sets for select 
     fd_set connectedSockets, readSockets;
@@ -264,13 +265,13 @@ int main(int argc, char* const *argv){
                     int newClient = acceptConnection(serverSocket);
                     FD_SET(newClient, &connectedSockets);
 
-                    if (newClient > maxSocket){
+                    if (newClient > maxSocket) {
                         maxSocket = newClient;
                     }
 
                     //increment number of connections made
                     connectionNum++;
-                    printf("SERVER: connection number %d\n", connectionNum);
+                    //printf("SERVER: connection number %d\n", connectionNum);
 
                 } else {
                     //read book from connection
@@ -284,7 +285,7 @@ int main(int argc, char* const *argv){
         }
     }
 
-    printList(head);
+    //printList(head);
 
     return 0;
 

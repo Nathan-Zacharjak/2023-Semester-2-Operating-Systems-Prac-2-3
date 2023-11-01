@@ -43,7 +43,7 @@ int main(int argc, char* const *argv){
     // Formatting command
     // nc localhost <port> -i <delay> < file.txt
     char command[50] = "\0";
-    sprintf(command, "nc localhost %d -i 1 < input/book%d.txt", port, bookNumber);
+    sprintf(command, "nc localhost %d -i < input/test1.txt", port);
 
     // Executing command
     printf("Client %d: Executing command: '%s'\n", bookNumber, command);

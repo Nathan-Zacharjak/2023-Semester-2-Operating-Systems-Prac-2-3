@@ -8,7 +8,7 @@
 
 // Including this just so intellisense works in VSCode, but it should work with this commented out
 // (It should be included as part of unistd.h but I was having difficulties...)
-#include <bits/getopt_posix.h>
+// #include <bits/getopt_posix.h>
 
 #define MAX_LINE 10000
 #define TRUE 1
@@ -114,16 +114,16 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
             } else {
                 // printf("THE OTHER BOOKLINES,, ehee\n");
                 // All other book lines
-                printf("line 1\n");
+                //printf("line 1\n");
                 prevNode->book_next = newNode;
-                printf("line 2\n");
+                //printf("line 2\n");
                 addNode(head, newNode);
-                printf("line 3\n");
+                //printf("line 3\n");
                 prevNode = (struct Node*)malloc(sizeof(Node));
-                printf("line 4\n");
+                //printf("line 4\n");
                 prevNode = newNode;
             }
-            printf("SERVER: added node to linked list\n");
+            //printf("SERVER: added node to linked list\n");
         }
 
         bzero(buffer, MAX_LINE);

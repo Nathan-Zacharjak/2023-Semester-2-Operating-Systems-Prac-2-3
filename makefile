@@ -35,4 +35,14 @@ compclient2: client.c
 runclient2: client
 	./client -l 1234 -b 2
 
-clients: client1 client2
+client3: compclient3 runclient3
+
+compclient3: client.c
+	gcc -Wall -O3 -o client client.c
+
+# l = port number
+# b = book number
+runclient3: client
+	./client -l 1234 -b 3
+
+clients: client1 && client2

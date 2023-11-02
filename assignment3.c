@@ -62,8 +62,8 @@ int acceptConnection(int serverSocket){
     int newSocket = accept(serverSocket, (struct sockaddr *) &clientAddress, (socklen_t*)&clientLen);
     
     if (newSocket < 0){
-        printf("SERVER: accept error: %d\n", newSocket);
-        return 0;
+        perror("SERVER: accept error");
+        exit(1);
     } 
     printf("SERVER: accepted new connection\n");
 
@@ -93,6 +93,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
         newNode->text = strdup(buffer);
         newNode->next = NULL;
         newNode->book_next = NULL;
+        //printf("Line added to linked list: ");
         printf("%s\n", newNode->text);
 
         // First ever line from the first book
@@ -110,7 +111,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
                 bookHeads[bookInd] = newNode;
                 prevNode = bookHeads[bookInd];
                 addNode(head,newNode);
-                printf("line 1\n");
+                //printf("line 1\n");
             } else {
                 // printf("THE OTHER BOOKLINES,, ehee\n");
                 // All other book lines
@@ -132,6 +133,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     //printf("READ STATUS %d\n", readStatus);
     if (readStatus < 0){
         perror("SERVER: read error");
+        exit(1);
     } else if (readStatus == 0){
         printf("Server: client reached EOF! \n");
     }
@@ -158,8 +160,8 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
         int fileStatus = fputs(currentNode->text,file); 
                        
         if (fileStatus < 0){
-            printf("SERVER: file write error: %d\n", fileStatus);
-            return;
+            perror("SERVER: file write error");
+            exit(1);
         }
 
         currentNode = currentNode->book_next;
@@ -168,8 +170,8 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     int fileStatus = fputs(currentNode->text,file); 
 
     if (fileStatus < 0){
-        printf("SERVER: file write error: %d\n", fileStatus);
-        return;
+        perror("SERVER: file write error");
+        exit(1);
     }
 
     fclose(file);
@@ -249,8 +251,8 @@ int main(int argc, char* const *argv){
         int activity = select(FD_SETSIZE, &readSockets, NULL, NULL, &tv);
 
         if (activity < 0){
-            printf("SERVER: select error %d\n", activity);
-            return 0;
+            perror("SERVER: select error");
+            exit(1);
         }
 
         //check ready client sockets 

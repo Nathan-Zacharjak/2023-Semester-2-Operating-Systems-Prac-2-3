@@ -1,6 +1,6 @@
 # Makefile to complie and run the server and clients
 
-all: server client1
+all: server 
 
 
 server: compserver runserver

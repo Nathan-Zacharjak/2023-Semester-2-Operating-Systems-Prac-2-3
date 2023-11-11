@@ -13,7 +13,7 @@
 #define MAX_LINE 10000
 #define TRUE 1
 #define FALSE 0
-#define MAX_CLIENTS 20
+#define MAX_CLIENTS 50
 
 //function creates server socket
 int startServer(int port){
@@ -48,7 +48,7 @@ int startServer(int port){
         exit(1);
     }
 
-    printf("SERVER STARTED\n");
+    //printf("SERVER STARTED\n");
 
     return serverSocket;
 
@@ -65,7 +65,7 @@ int acceptConnection(int serverSocket){
         perror("SERVER: accept error");
         exit(1);
     } 
-    printf("SERVER: accepted new connection\n");
+    //printf("SERVER: accepted new connection\n");
 
     return newSocket;
 }
@@ -93,8 +93,8 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
         newNode->text = strdup(buffer);
         newNode->next = NULL;
         newNode->book_next = NULL;
-        //printf("Line added to linked list: ");
-        printf("%s\n", newNode->text);
+        printf("Line added to linked list: ");
+        printf("%s", newNode->text);
 
         // First ever line from the first book
         if (head->text == NULL){
@@ -134,9 +134,9 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
     if (readStatus < 0){
         perror("SERVER: read error");
         exit(1);
-    } else if (readStatus == 0){
-        printf("Server: client reached EOF! \n");
-    }
+    } /*else if (readStatus == 0){
+        //printf("Server: client reached EOF! \n");
+    }*/
 
     close(newSocket);
     //printf("SERVER: closing connection to client num %d\n", connectionNum);
@@ -180,6 +180,7 @@ void readClient(int newSocket, struct Node *head, struct Node **bookHeads, int c
 
 // MAIN FUNCTION!
 int main(int argc, char* const *argv){
+    setbuf(stdout, NULL);
 
     // Reading the given arguments to run the server
     int portNum = 0;
@@ -213,7 +214,7 @@ int main(int argc, char* const *argv){
         }
     }
 
-    printf("SERVER: Port: %d Search Term: %s\n", portNum, searchTerm);
+    //printf("SERVER: Port: %d Search Term: %s\n", portNum, searchTerm);
     
     //initialise head of linked list
     struct Node *head = (struct Node*) malloc(sizeof(Node));
